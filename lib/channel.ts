@@ -209,7 +209,7 @@ export class ChannelContract {
 
   claim (receiver: string, channelId: string, value: number, v: number, r: string, s: string): Promise<BigNumber.BigNumber> {
     return new Promise<BigNumber.BigNumber>((resolve, reject) => {
-      const h = ethHash(channelId.toString() + value.toString())
+      const h = Payment.digest(channelId, value)
       this.contract.claim(channelId, value, h, v, r, s, {from: receiver}, () => {
         const didSettle = this.contract.DidSettle({channelId})
         didSettle.watch<Broker.DidSettle>((error, result) => {
