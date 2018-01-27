@@ -200,7 +200,10 @@ export default class Machinomy {
     if (toSpend.greaterThan(channel.value)) {
       throw new Error(`Total spend ${toSpend.toString()} is larger than channel value ${channel.value.toString()}`)
     }
-    return Payment.fromPaymentChannel(this.web3, channel, new PaymentRequired(channel.receiver, amount, '', meta))
+    let payment = await Payment.fromPaymentChannel(this.web3, channel, new PaymentRequired(channel.receiver, amount, '', meta))
+    let nextPaymentChannel = PaymentChannel.fromPayment(payment)
+    await this.storage.channels.saveOrUpdate(nextPaymentChannel)
+    return payment
   }
 
   /**
