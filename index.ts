@@ -11,8 +11,8 @@ import Payment from './lib/Payment'
 import * as receiver from './lib/receiver'
 import { TransactionResult } from 'truffle-contract'
 import serviceRegistry, { Container } from './lib/container'
-import {ChannelId} from "./lib/channel";
-import {PaymentRequired} from "./lib/transport";
+import { ChannelId } from './lib/channel'
+import { PaymentRequired } from './lib/transport'
 
 /**
  * Options for machinomy buy.
