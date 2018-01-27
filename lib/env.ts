@@ -3,7 +3,7 @@ export interface IEnv {
   CONTRACT_ADDRESS?: string
 }
 
-declare var window: Window
+declare var window: any
 
 /* tslint:disable */
 export function container (): IEnv {
