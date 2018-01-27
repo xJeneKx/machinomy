@@ -11,6 +11,8 @@ import Payment from './lib/Payment'
 import * as receiver from './lib/receiver'
 import { TransactionResult } from 'truffle-contract'
 import serviceRegistry, { Container } from './lib/container'
+import {ChannelId} from "./lib/channel";
+import {PaymentRequired} from "./lib/transport";
 
 /**
  * Options for machinomy buy.
@@ -183,6 +185,18 @@ export default class Machinomy {
         }
       }).catch(reject)
     })
+  }
+
+  async nextPayment (channelId: string | ChannelId, amount: BigNumber.BigNumber, meta: string): Promise<Payment> {
+    let channel = await this.storage.channels.firstById(channelId)
+    if (!channel) {
+      throw new Error(`Channel with id ${channelId.toString()} not found.`)
+    }
+    const toSpend = channel.spent.add(amount)
+    if (toSpend.greaterThan(channel.value)) {
+      throw new Error(`Total spend ${toSpend.toString()} is larger than channel value ${channel.value.toString()}`)
+    }
+    return Payment.fromPaymentChannel(this.web3, channel, new PaymentRequired(channel.receiver, amount, '', meta))
   }
 
   /**
