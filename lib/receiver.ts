@@ -7,13 +7,6 @@ import Storage from './storage'
 import Payment from './Payment'
 
 const log = Log.create('sender')
-export const isPaymentValid = (payment: Payment, paymentChannel: PaymentChannel): boolean => {
-  let validIncrement = (paymentChannel.spent.plus(payment.price)).lessThanOrEqualTo(paymentChannel.value)
-  let validChannelValue = paymentChannel.value.equals(payment.channelValue)
-  let validPaymentValue = paymentChannel.value.lessThanOrEqualTo(payment.channelValue)
-  return validIncrement && validChannelValue && validPaymentValue
-}
-
 export class Receiver {
   web3: Web3
   account: string
@@ -46,10 +39,8 @@ export class Receiver {
      * @return {Promise<string>}
      */
   acceptPayment (payment: Payment): Promise<string> {
-    this.ensureCanAcceptPayment(payment)
-
     return this.findPaymentChannel(payment).then(paymentChannel => {
-      if (paymentChannel && !isPaymentValid(payment, paymentChannel)) {
+      if (paymentChannel && !Payment.isValid(this.web3, payment, paymentChannel)) {
         return this.whenInvalidPayment(payment, paymentChannel)
       } else {
         return this.whenValidPayment(payment)

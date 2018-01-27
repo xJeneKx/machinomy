@@ -11,7 +11,6 @@ import { TransactionResult } from 'truffle-contract'
 import PaymentsDatabase from './storages/payments_database'
 import Payment from './Payment'
 import Web3 = require('web3')
-import { isPaymentValid } from './receiver'
 import TokensDatabase from './storages/tokens_database'
 
 export default interface ChannelManager extends EventEmitter {
@@ -100,7 +99,8 @@ export class ChannelManagerImpl extends EventEmitter implements ChannelManager {
 
       const channel = channels[0]
 
-      if (!isPaymentValid(payment, channel)) {
+      let isValid = Payment.isValid(this.web3, payment, channel)
+      if (!isValid) {
         throw new Error('Invalid payment.')
       }
 
