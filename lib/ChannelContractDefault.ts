@@ -25,6 +25,13 @@ export class ChannelContractDefault {
     value = new BigNumber.BigNumber(value)
     let channelId = paymentChannel.channelId
     let deployed = await Broker.deployed(this.web3.currentProvider)
+    console.log('trying claim')
+    console.log(receiver)
+    console.log(paymentChannel)
+    console.log(value)
+    console.log(v)
+    console.log(r)
+    console.log(s)
     let canClaim = await deployed.canClaim(channelId, value, Number(v), r, s)
     if (!canClaim) {
       return Promise.reject(new Error('Claim isn\'t possible'))
