@@ -294,7 +294,9 @@ export default class Machinomy {
     }
     if (openChannels.length === 0) {
       let paymentRequired = new PaymentRequired(receiver, new BigNumber.BigNumber(0), 'gateway', 'meta')
-      return this.channelContract.buildPaymentChannel(this.account, paymentRequired, channelValue, this.settlementPeriod || 0)
+      let paymentChannel = await this.channelContract.buildPaymentChannel(this.account, paymentRequired, channelValue, this.settlementPeriod || 0)
+      await this.storage.channels.saveOrUpdate(paymentChannel)
+      return paymentChannel
     } else {
       return _.head(openChannels)!
     }
