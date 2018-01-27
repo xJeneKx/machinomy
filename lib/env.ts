@@ -3,6 +3,8 @@ export interface IEnv {
   CONTRACT_ADDRESS?: string
 }
 
+declare var window: Window
+
 /* tslint:disable */
 export function container (): IEnv {
   if (typeof global !== 'undefined') {
