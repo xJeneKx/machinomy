@@ -82,10 +82,9 @@ export class Receiver {
     log.error(`Invalid payment. Closing the channel ${paymentChannel.channelId}`)
     return this.storage.payments.firstMaximum(paymentChannel.channelId).then(payment => {
       if (payment) {
-        // return channel.contract(this.web3).claim(this.account, payment.channelId, payment.value, payment.v, payment.r, payment.s).then(claimedValue => {
-        //   return Promise.reject(new Error(`Claimed ${claimedValue} from channel ${payment.channelId} after invalid payment`))
-        // })
-        return Promise.reject(new Error('Do not claim money on non-existent channel'))
+        return channel.contract(this.web3).claim(this.account, paymentChannel, payment.value, payment.v, payment.r, payment.s).then(claimedValue => {
+          return Promise.reject(new Error(`Claimed ${claimedValue} from channel ${payment.channelId} after invalid payment`))
+        })
       } else {
         return Promise.reject(new Error('Do not claim money on non-existent channel'))
       }
