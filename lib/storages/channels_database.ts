@@ -14,7 +14,7 @@ export default interface ChannelsDatabase {
 
   firstById (channelId: ChannelId | string): Promise<PaymentChannel | null>
 
-  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void>
+  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber, value: BigNumber.BigNumber): Promise<void>
 
   all (): Promise<Array<PaymentChannel>>
 
@@ -72,7 +72,7 @@ export abstract class AbstractChannelsDatabase<T extends Engine> implements Chan
   saveOrUpdate (paymentChannel: PaymentChannel): Promise<void> {
     return this.firstById(paymentChannel.channelId).then((found: PaymentChannel|null) => {
       if (found) {
-        return this.spend(paymentChannel.channelId, paymentChannel.spent)
+        return this.spend(paymentChannel.channelId, paymentChannel.spent, paymentChannel.value)
       } else {
         return this.save(paymentChannel)
       }
@@ -81,7 +81,7 @@ export abstract class AbstractChannelsDatabase<T extends Engine> implements Chan
 
   abstract firstById (channelId: ChannelId | string): Promise<PaymentChannel | null>
 
-  abstract spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void>
+  abstract spend (channelId: ChannelId | string, spent: BigNumber.BigNumber, value: BigNumber.BigNumber): Promise<void>
 
   abstract all (): Promise<Array<PaymentChannel>>
 
@@ -127,7 +127,7 @@ export class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> i
   /**
    * Set amount of money spent on the channel.
    */
-  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void> {
+  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber, value: BigNumber.BigNumber): Promise<void> {
     return this.engine.exec((client: any) => {
       const query = {
         kind: this.kind,
@@ -136,7 +136,8 @@ export class NedbChannelsDatabase extends AbstractChannelsDatabase<EngineNedb> i
 
       const update = {
         $set: {
-          spent: spent.toString()
+          spent: spent.toString(),
+          value: value.toString()
         }
       }
 
@@ -222,7 +223,7 @@ export class MongoChannelsDatabase extends AbstractChannelsDatabase<EngineMongo>
   /**
    * Set amount of money spent on the channel.
    */
-  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void> {
+  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber, value: BigNumber.BigNumber): Promise<void> {
     return this.engine.exec((client: any) => {
       const query = {
         kind: this.kind,
@@ -231,7 +232,8 @@ export class MongoChannelsDatabase extends AbstractChannelsDatabase<EngineMongo>
 
       const update = {
         $set: {
-          spent: spent.toString()
+          spent: spent.toString(),
+          value: value.toString()
         }
       }
 
@@ -306,12 +308,13 @@ export class PostgresChannelsDatabase extends AbstractChannelsDatabase<EnginePos
     )).then((res: any) => this.inflatePaymentChannel(res.rows[0]))
   }
 
-  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber): Promise<void> {
+  spend (channelId: ChannelId | string, spent: BigNumber.BigNumber, value: BigNumber.BigNumber): Promise<void> {
     return this.engine.exec((client: any) => client.query(
-      'UPDATE channel SET (spent)=($2) WHERE "channelId" = $1',
+      'UPDATE channel SET (spent)=($2), (value)=($3) WHERE "channelId" = $1',
       [
         channelId.toString(),
-        spent.toString()
+        spent.toString(),
+        value.toString()
       ]
     ))
   }

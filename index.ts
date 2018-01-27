@@ -185,7 +185,7 @@ export default class Machinomy {
         if (paymentChannel) {
           this.channelContract.deposit(this.account, paymentChannel, _value).then(() => {
             paymentChannel.value = paymentChannel.value.plus(_value)
-            this.storage.channels.save(paymentChannel).then(() => {
+            return this.storage.channels.saveOrUpdate(paymentChannel).then(() => {
               resolve()
             })
           }).catch(reject)
