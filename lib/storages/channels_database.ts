@@ -70,7 +70,7 @@ export abstract class AbstractChannelsDatabase<T extends Engine> implements Chan
   abstract save (paymentChannel: PaymentChannel): Promise<void>
 
   saveOrUpdate (paymentChannel: PaymentChannel): Promise<void> {
-    return this.firstById(paymentChannel.channelId).then((found: PaymentChannel) => {
+    return this.firstById(paymentChannel.channelId).then((found: PaymentChannel|null) => {
       if (found) {
         return this.spend(paymentChannel.channelId, paymentChannel.spent)
       } else {
