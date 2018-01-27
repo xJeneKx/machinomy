@@ -49,9 +49,9 @@ export default class Payment {
     this.channelId = options.channelId
     this.sender = options.sender
     this.receiver = options.receiver
-    this.price = options.price
-    this.value = options.value
-    this.channelValue = options.channelValue
+    this.price = new BigNumber.BigNumber(options.price)
+    this.value = new BigNumber.BigNumber(options.value)
+    this.channelValue = new BigNumber.BigNumber(options.channelValue)
     this.v = Number(options.v)
     this.r = options.r
     this.s = options.s
