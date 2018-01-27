@@ -62,12 +62,12 @@ export default class Payment {
 
   // TODO use it
   static async isValid (web3: Web3, payment: Payment, paymentChannel: PaymentChannel): Promise<boolean> {
-    let validIncrement = (paymentChannel.spent.plus(payment.price)).lessThanOrEqualTo(paymentChannel.value)
-    let validChannelValue = paymentChannel.value.equals(payment.channelValue)
+    let validIncrement = (paymentChannel.spent.plus(payment.price)).lte(paymentChannel.value)
+    let validChannelValue = paymentChannel.value.eq(payment.channelValue)
     let validChannelId = paymentChannel.channelId === payment.channelId
-    let validPaymentValue = paymentChannel.value.lessThanOrEqualTo(payment.channelValue)
+    let validPaymentValue = paymentChannel.value.lte(payment.channelValue)
     let validSender = paymentChannel.sender === payment.sender
-    let isPositive = payment.value.greaterThanOrEqualTo(new BigNumber.BigNumber(0)) && payment.price.greaterThanOrEqualTo(new BigNumber.BigNumber(0))
+    let isPositive = payment.value.gte(new BigNumber.BigNumber(0)) && payment.price.gte(new BigNumber.BigNumber(0))
     let deployed
     if (paymentChannel.contractAddress) {
       deployed = await TokenBroker.deployed(web3.currentProvider)
