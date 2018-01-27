@@ -13,6 +13,7 @@ import { TransactionResult } from 'truffle-contract'
 import { Registry, Container } from './lib/container'
 import { ChannelId } from './lib/channel'
 import { PaymentRequired } from './lib/transport'
+import * as _ from 'lodash'
 
 /**
  * Options for machinomy buy.
@@ -271,6 +272,32 @@ export default class Machinomy {
 
   shutdown (): Promise<void> {
     return this.storage.close()
+  }
+
+  canUseChannel (paymentChannel: PaymentChannel, price: BigNumber.BigNumber): Promise<boolean> {
+    return this.channelContract.getState(paymentChannel).then(state => {
+      let isOpen = state === 0 // FIXME Harmonize channel states
+      // log.debug(`canUseChannel: isOpen: ${isOpen}`)
+      let funded = paymentChannel.value.greaterThanOrEqualTo(paymentChannel.spent.plus(price))
+      // log.debug(`canUseChannel: funded: ${funded}`)
+      return isOpen && funded
+    })
+  }
+
+  async requireOpenChannel (sender: string, receiver: string, channelValue: BigNumber.BigNumber): Promise<PaymentChannel> {
+    let paymentChannels = await this.storage.channels.findBySenderReceiver(sender, receiver)
+    let openChannels = paymentChannels.filter(paymentChannel => {
+      return this.canUseChannel(paymentChannel, new BigNumber.BigNumber(0))
+    })
+    if (openChannels.length > 1) {
+      console.warn(`Found more than one channel from ${this.account} to ${receiver}`)
+    }
+    if (openChannels.length === 0) {
+      let paymentRequired = new PaymentRequired(receiver, new BigNumber.BigNumber(0), 'gateway', 'meta')
+      return this.channelContract.buildPaymentChannel(this.account, paymentRequired, channelValue, this.settlementPeriod || 0)
+    } else {
+      return _.head(openChannels)!
+    }
   }
 
   /**

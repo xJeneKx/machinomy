@@ -7,7 +7,6 @@ import { ChannelContractToken } from './ChannelContractToken'
 import { PaymentChannelJSON, PaymentChannel } from './paymentChannel'
 export { PaymentChannelJSON, PaymentChannel }
 import { TransactionResult } from 'truffle-contract'
-import serviceRegistry from './container'
 const log = Log.create('channel')
 Log.setProductionMode()
 
@@ -36,11 +35,12 @@ export class ChannelContract {
     this.web3 = web3
   }
 
-  createChannel (paymentRequired: PaymentRequired, duration: number, settlementPeriod: number, options: any): any {
-    return new Promise<PaymentChannel>((resolve, reject) => {
+  createChannel (paymentRequired: PaymentRequired, duration: number, settlementPeriod: number, options: any): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
       let channelContract = this.buildChannelContract(paymentRequired)
-      channelContract.createChannel(paymentRequired, duration, settlementPeriod, options).then((channelId: any) => {
-        resolve(channelId)
+      channelContract.createChannel(paymentRequired, duration, settlementPeriod, options).then(txResult => {
+        console.log(txResult)
+        resolve(txResult.logs[0].args.channelId)
       }).catch((e: Error) => {
         reject(e)
       })
@@ -65,8 +65,7 @@ export class ChannelContract {
         value,
         gas: CREATE_CHANNEL_GAS
       } as Web3.TxData
-      this.createChannel(paymentRequired, duration, settlementPeriod, options).then((res: any) => {
-        const channelId = res.logs[0].args.channelId
+      this.createChannel(paymentRequired, duration, settlementPeriod, options).then(channelId => {
         const paymentChannel = new PaymentChannel(sender, receiver, channelId, value, new BigNumber.BigNumber(0), undefined, paymentRequired.contractAddress)
         resolve(paymentChannel)
       }).catch((e: Error) => {

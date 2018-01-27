@@ -241,20 +241,4 @@ export default class Sender {
       }
     })
   }
-
-  async requireOpenChannel (sender: string, receiver: string, channelValue: BigNumber.BigNumber): Promise<PaymentChannel> {
-    let paymentChannels = await this.storage.channels.findBySenderReceiver(sender, receiver)
-    let openChannels = paymentChannels.filter(paymentChannel => {
-      return this.canUseChannel(paymentChannel, new BigNumber.BigNumber(0))
-    })
-    if (openChannels.length > 1) {
-      log.warn(`Found more than one channel from ${this.account} to ${receiver}`)
-    }
-    if (openChannels.length === 0) {
-      let paymentRequired = new PaymentRequired(receiver, new BigNumber.BigNumber(0), 'gateway', 'meta')
-      return this.contract.buildPaymentChannel(this.account, paymentRequired, channelValue, this.settlementPeriod)
-    } else {
-      return _.head(openChannels)!
-    }
-  }
 }

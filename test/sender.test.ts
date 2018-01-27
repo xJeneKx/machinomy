@@ -44,7 +44,7 @@ describe('sender', () => {
       it('determine if channel can be used', async () => {
         let paymentChannel = channel.PaymentChannel.fromPayment(payment)
         let s = await randomSender()
-        expect(s.canUseChannel(paymentChannel, paymentRequired)).toBeTruthy()
+        expect(s.canUseChannel(paymentChannel, paymentRequired.price)).toBeTruthy()
       })
     })
   })
