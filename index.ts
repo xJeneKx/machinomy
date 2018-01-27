@@ -10,7 +10,7 @@ import * as BigNumber from 'bignumber.js'
 import Payment from './lib/Payment'
 import * as receiver from './lib/receiver'
 import { TransactionResult } from 'truffle-contract'
-import serviceRegistry, { Container } from './lib/container'
+import { Registry, Container } from './lib/container'
 import { ChannelId } from './lib/channel'
 import { PaymentRequired } from './lib/transport'
 
@@ -99,6 +99,7 @@ export default class Machinomy {
   private channelContract: ChannelContract
 
   private serviceContainer: Container
+  private registry: Registry
 
   /**
    * Create an instance of Machinomy.
@@ -115,12 +116,14 @@ export default class Machinomy {
    * @param options - Options object
    */
   constructor (account: string, web3: Web3, options: MachinomyOptions) {
-    serviceRegistry.bind('Web3', () => web3)
-    serviceRegistry.bind('MachinomyOptions', () => options)
-    serviceRegistry.bind('account', () => account)
+    this.registry = new Registry()
+    this.registry.bind('Web3', () => web3)
+    this.registry.bind('MachinomyOptions', () => options)
+    this.registry.bind('account', () => account)
+    this.registry.bind('ChannelContract', (web3: Web3) => new ChannelContract(web3))
 
-    this.serviceContainer = new Container(serviceRegistry)
-    this.channelContract = this.serviceContainer.resolve('ChannelContract')
+    this.serviceContainer = new Container(this.registry)
+    this.channelContract = new ChannelContract(web3)
 
     this.account = account
     this.web3 = web3

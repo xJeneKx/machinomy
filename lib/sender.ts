@@ -107,11 +107,11 @@ export default class Sender {
   /**
    * Determine if channel can be used.
    */
-  canUseChannel (paymentChannel: PaymentChannel, paymentRequired: PaymentRequired): Promise<boolean> {
+  canUseChannel (paymentChannel: PaymentChannel, price: BigNumber.BigNumber): Promise<boolean> {
     return this.contract.getState(paymentChannel).then(state => {
       let isOpen = state === 0 // FIXME Harmonize channel states
       // log.debug(`canUseChannel: isOpen: ${isOpen}`)
-      let funded = paymentChannel.value.greaterThanOrEqualTo(paymentChannel.spent.plus(paymentRequired.price))
+      let funded = paymentChannel.value.greaterThanOrEqualTo(paymentChannel.spent.plus(price))
       // log.debug(`canUseChannel: funded: ${funded}`)
       return isOpen && funded
     })
@@ -136,7 +136,7 @@ export default class Sender {
   async findOpenChannel (paymentRequired: PaymentRequired): Promise<PaymentChannel | undefined> {
     let paymentChannels = await this.storage.channels.findBySenderReceiver(this.account, paymentRequired.receiver)
     let openChannels = paymentChannels.filter(paymentChannel => {
-      return this.canUseChannel(paymentChannel, paymentRequired)
+      return this.canUseChannel(paymentChannel, paymentRequired.price)
     })
     if (openChannels.length > 1) {
       log.warn(`Found more than one channel from ${this.account} to ${paymentRequired.receiver}`)
@@ -240,5 +240,21 @@ export default class Sender {
         return this.freshChannel(uri, paymentRequired, value) // Build new channel
       }
     })
+  }
+
+  async requireOpenChannel (sender: string, receiver: string, channelValue: BigNumber.BigNumber): Promise<PaymentChannel> {
+    let paymentChannels = await this.storage.channels.findBySenderReceiver(sender, receiver)
+    let openChannels = paymentChannels.filter(paymentChannel => {
+      return this.canUseChannel(paymentChannel, new BigNumber.BigNumber(0))
+    })
+    if (openChannels.length > 1) {
+      log.warn(`Found more than one channel from ${this.account} to ${receiver}`)
+    }
+    if (openChannels.length === 0) {
+      let paymentRequired = new PaymentRequired(receiver, new BigNumber.BigNumber(0), 'gateway', 'meta')
+      return this.contract.buildPaymentChannel(this.account, paymentRequired, channelValue, this.settlementPeriod)
+    } else {
+      return _.head(openChannels)!
+    }
   }
 }
