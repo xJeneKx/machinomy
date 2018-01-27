@@ -52,11 +52,10 @@ describe('storage', () => {
   })
 
   describe('.build', () => {
-    it('return Storage', done => {
-      return support.tmpFileName().then(filename => {
-        let s = storage.build(web3, filename, 'namespace', true, engineName)
-        expect(typeof s).toBe('object')
-      }).then(done)
+    it('return Storage', async () => {
+      let filename = await support.tmpFileName()
+      let s = storage.build(web3, filename, 'namespace', true, engineName)
+      expect(typeof s).toBe('object')
     })
   })
 
