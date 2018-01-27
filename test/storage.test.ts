@@ -78,7 +78,7 @@ describe('storage', () => {
         let spent = new BigNumber.BigNumber(33)
         return channelsDatabase(support.fakeWeb3(), engine).then(channels => {
           return channels.save(paymentChannel).then(() => {
-            return channels.spend(channelId, spent,, paymentChannel.value)
+            return channels.spend(channelId, spent, paymentChannel.value)
           }).then(() => {
             return channels.firstById(channelId)
           })
