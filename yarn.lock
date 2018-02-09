@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@machinomy/contracts@^3.1.0":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@machinomy/contracts/-/contracts-3.1.1.tgz#af5ad280935264a936ba979102415e17e9fe3db5"
+"@machinomy/contracts@^3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@machinomy/contracts/-/contracts-3.1.2.tgz#d8d1cb7d5e669da1e1a753576be697b06c23698e"
   dependencies:
     bignumber.js "^4.1.0"
     buffer "^5.0.7"
