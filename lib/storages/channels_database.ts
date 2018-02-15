@@ -78,7 +78,7 @@ export abstract class AbstractChannelsDatabase<T extends Engine> implements Chan
   saveOrUpdate (paymentChannel: PaymentChannel): Promise<void> {
     AbstractChannelsDatabase.LOG(`Saving or updating channel with ID ${paymentChannel.channelId.toString()}`)
 
-    return this.firstById(paymentChannel.channelId).then((found: PaymentChannel) => {
+    return this.firstById(paymentChannel.channelId).then((found: PaymentChannel | null) => {
       if (found) {
         AbstractChannelsDatabase.LOG(`Spending channel with ID ${paymentChannel.channelId.toString()}`)
         return this.spend(paymentChannel.channelId, paymentChannel.spent)
@@ -411,7 +411,7 @@ export class PostgresChannelsDatabase extends AbstractChannelsDatabase<EnginePos
         amount.toString()
       ]
     )).then((res: any) => this.inflatePaymentChannel(res.rows[0]))
-      .then((channel: PaymentChannel) => this.filterByState(0, [channel])[0] || null)
+      .then((channel: PaymentChannel | null) => channel ? this.filterByState(0, [channel])[0] : null)
   }
 
   findBySenderReceiver (sender: string, receiver: string): Promise<Array<PaymentChannel>> {

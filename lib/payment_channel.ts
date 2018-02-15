@@ -57,6 +57,18 @@ export class PaymentChannel {
       document.contractAddress
     )
   }
+
+  toJSON (): PaymentChannelJSON {
+    return {
+      state: this.state,
+      spent: this.spent,
+      value: this.value,
+      channelId: this.channelId,
+      receiver: this.receiver,
+      sender: this.sender,
+      contractAddress: this.contractAddress
+    }
+  }
 }
 
 export class PaymentChannelSerde implements Serde<PaymentChannel> {

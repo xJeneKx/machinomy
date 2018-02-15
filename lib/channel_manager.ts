@@ -132,7 +132,7 @@ export class ChannelManagerImpl extends EventEmitter implements ChannelManager {
 
   requireOpenChannel (sender: string, receiver: string, amount: BigNumber.BigNumber, minDepositAmount?: BigNumber.BigNumber): Promise<PaymentChannel> {
     return this.mutex.synchronize(() => {
-      return this.channelsDao.findUsable(sender, receiver, amount).then((channel: PaymentChannel) => {
+      return this.channelsDao.findUsable(sender, receiver, amount).then((channel: PaymentChannel | null) => {
         return channel || this.internalOpenChannel(sender, receiver, amount, minDepositAmount)
       })
     })
@@ -213,7 +213,7 @@ export class ChannelManagerImpl extends EventEmitter implements ChannelManager {
   }
 
   private claim (channel: PaymentChannel): Promise<TransactionResult> {
-    return this.paymentsDao.firstMaximum(channel.channelId).then((payment: Payment) => {
+    return this.paymentsDao.firstMaximum(channel.channelId).then((payment: Payment | null) => {
       if (!payment) {
         throw new Error(`No payment found for channel ID ${channel.channelId.toString()}`)
       }
