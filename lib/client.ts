@@ -117,7 +117,7 @@ export class AcceptTokenResponseSerde implements Serde<AcceptTokenResponse> {
 export default interface Client {
   doPreflight (uri: string): Promise<PaymentRequired>
   doPayment (payment: Payment, gateway: string): Promise<AcceptPaymentResponse>
-  acceptPayment (req: AcceptPaymentRequest): Promise<AcceptPaymentResponse>
+  acceptPayment (payment: Payment): Promise<AcceptPaymentResponse>
   doVerify (token: string, gateway: string): Promise<AcceptTokenResponse>
   acceptVerify (req: AcceptTokenRequest): Promise<AcceptTokenResponse>
 }
@@ -176,8 +176,8 @@ export class ClientImpl extends EventEmitter implements Client {
     })
   }
 
-  acceptPayment (req: AcceptPaymentRequest): Promise<AcceptPaymentResponse> {
-    const payment = req.payment
+  acceptPayment (payment: Payment): Promise<AcceptPaymentResponse> {
+    // const payment = req.payment
 
     LOG(`Received payment request. Sender: ${payment.sender} / Receiver: ${payment.receiver}`)
 

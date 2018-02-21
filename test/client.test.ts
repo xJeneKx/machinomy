@@ -178,11 +178,25 @@ describe('ClientImpl', () => {
           contractAddress: '0xab',
           token: '0x123'
         }
-      })
+      });
+
+      // const payment = {
+      //   channelId: '0x1234',
+      //   value: '1000',
+      //   sender: '0xbeef',
+      //   receiver: '0xdead',
+      //   price: '100',
+      //   channelValue: '1000',
+      //   v: 27,
+      //   r: '0xa',
+      //   s: '0xb',
+      //   contractAddress: '0xab',
+      //   token: '0x123'
+      // }
 
       channelManager.acceptPayment = sinon.stub().withArgs(req.payment).resolves('token')
 
-      return client.acceptPayment(req).then((res: AcceptPaymentResponse) => {
+      return client.acceptPayment(req.payment).then((res: AcceptPaymentResponse) => {
         expect(res.token).toBe('token')
       })
     })

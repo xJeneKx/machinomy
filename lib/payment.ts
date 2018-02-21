@@ -13,7 +13,7 @@ export interface PaymentJSON {
   r: string
   s: string
   meta: string
-  contractAddress?: string
+  contractAddress: string
   token: string | undefined
 }
 

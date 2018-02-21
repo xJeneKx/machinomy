@@ -15,6 +15,7 @@ import { PaymentRequired } from './lib/transport'
 import PaymentsDatabase from './lib/storages/payments_database'
 import defaultRegistry from './lib/services'
 import ChannelContract from './lib/channel_contract'
+import {AcceptPaymentRequest} from "../hub/node_modules/machinomy/lib/client";
 
 /**
  * Options for machinomy buy.
@@ -245,8 +246,8 @@ export default class Machinomy {
   /**
    * Save payment into the storage and return an id of the payment. The id can be used by {@link Machinomy.paymentById}.
    */
-  acceptPayment (req: any): Promise <AcceptPaymentResponse> {
-    return this.client.acceptPayment(AcceptPaymentRequestSerde.instance.deserialize(req))
+  acceptPayment (payment: Payment): Promise <AcceptPaymentResponse> {
+    return this.client.acceptPayment(payment)
   }
 
   /**

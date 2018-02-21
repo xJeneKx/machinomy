@@ -3,6 +3,7 @@ import ChainManager from './chain_manager'
 import { PaymentChannel } from './payment_channel'
 import Payment from './payment'
 import ChannelContract from './channel_contract'
+import Signature from "./signature";
 
 export default class PaymentManager {
   private chainManager: ChainManager
@@ -38,8 +39,14 @@ export default class PaymentManager {
     const validChannelId = paymentChannel.channelId === payment.channelId
     const validPaymentValue = paymentChannel.value.lessThanOrEqualTo(payment.channelValue)
     const validSender = paymentChannel.sender === payment.sender
+    //const isPositive = payment.value.greaterThanOrEqualTo(new BigNumber.BigNumber(0)) && payment.price.greaterThanOrEqualTo(new BigNumber.BigNumber(0))
     const isPositive = payment.value.greaterThanOrEqualTo(new BigNumber.BigNumber(0)) && payment.price.greaterThanOrEqualTo(new BigNumber.BigNumber(0))
+
     const canClaim = await this.channelContract.canClaim(payment.channelId, payment.value, payment.receiver, payment.signature)
+    console.log('SIGNUTURE IN CLAIM:'+payment.signature)
+    console.log('SIGNUTURE IN CLAIM PART R:'+payment.signature.toParts().r)
+    console.log('SIGNUTURE IN CLAIM PART S:'+payment.signature.toParts().s)
+    console.log('SIGNUTURE IN CLAIM PART V:'+payment.signature.toParts().v)
 
     return validIncrement &&
       validChannelValue &&
