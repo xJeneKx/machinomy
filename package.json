@@ -14,24 +14,25 @@
     "url": "https://github.com/machinomy/machinomy.git"
   },
   "scripts": {
-    "migrate": "db-migrate up",
-    "integration_test": "yarn build-test && NODE_ENV=test mocha integration_test/**/*.test.js",
-    "test_nedb": "NODE_ENV=test ENGINE_NAME=nedb mocha",
-    "test_mongo": "NODE_ENV=test ENGINE_NAME=mongo mocha",
-    "test_postgres": "NODE_ENV=test ENGINE_NAME=postgresql mocha",
-    "test": "yarn build-test && yarn run test_nedb && yarn run test_mongo && yarn run test_postgres",
-    "build": "tsc -p tsconfig.json",
-    "build-test": "tsc -p tsconfig.json --outDir .",
-    "lint": "tslint -t stylish -p '.' -e './node_modules/**/*.ts'",
     "prepublish": "yarn lint && yarn build",
-    "doc": "typedoc --ignoreCompilerErrors --out ./documentation --readme README.md --theme ../typedoc-theme index.ts "
+    "lint": "tslint --format stylish --project . --exclude 'node_modules/**/*.ts'",
+    "build": "tsc --project tsconfig.json",
+    "pretest": "yarn lint && tsc --project tsconfig.json --outDir .",
+    "test": "yarn test:unit",
+    "test:unit": "NODE_ENV=test mocha",
+    "test:db:nedb": "ENGINE_NAME=nedb yarn run test:unit",
+    "test:db:mongo": "ENGINE_NAME=mongo yarn run test:unit",
+    "test:db:postgresql": "ENGINE_NAME=postgresql yarn run test:unit",
+    "test:db:all": "yarn pretest && yarn run test:db:nedb && yarn run test:db:mongo && yarn run test:db:postgresql",
+    "test:integration": "yarn pretest && NODE_ENV=test mocha integration_test/**/*.test.js",
+    "migrate": "db-migrate up"
   },
-  "main": "./dist/index.js",
-  "typings": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "bin": {
-    "machinomy": "./dist/bin/machinomy.js"
+    "machinomy": "dist/bin/machinomy.js"
   },
-  "types": "./dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/"
   ],

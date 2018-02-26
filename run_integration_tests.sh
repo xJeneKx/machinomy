@@ -72,7 +72,7 @@ rm -rf ${TMP_DIR}
 echo "Running tests..."
 
 (
-  MACHINOMY_GETH_ADDR=http://localhost:8545 CONTRACT_ADDRESS=${CONTRACT_ADDR} SENDER_ADDRESS=0x58e95845a3c2740f4b1b4c639a75ada64ef0b72f RECEIVER_ADDRESS=0xbf51c40cdb04a8bbf14581c2fb3b9b4d7de39dcc yarn integration_test || exit 1
+  MACHINOMY_GETH_ADDR=http://localhost:8545 CONTRACT_ADDRESS=${CONTRACT_ADDR} SENDER_ADDRESS=0x58e95845a3c2740f4b1b4c639a75ada64ef0b72f RECEIVER_ADDRESS=0xbf51c40cdb04a8bbf14581c2fb3b9b4d7de39dcc yarn test:integration || exit 1
 ) &
 
 # Wait until tests complete, then kill the testnet.
